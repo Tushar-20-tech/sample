@@ -1,0 +1,33 @@
+.bid-history {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.bid-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.bid-item:last-child {
+    border-bottom: none;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar {
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.alert {
+    margin-bottom: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+}
