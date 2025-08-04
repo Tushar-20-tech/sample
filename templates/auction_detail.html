@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>{{ auction.player.name }}</h2>
+                {% if auction.player.is_uncapped %}
+                <span class="badge bg-info">Uncapped Player</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Type:</strong> {{ auction.player.type|title }}</p>
+                        <p><strong>Base Price:</strong> ₹{{ "%.2f"|format(auction.player.base_price) }} Cr</p>
+                        <p><strong>Current Bid:</strong> ₹{{ "%.2f"|format(auction.current_bid) }} Cr</p>
+                        <p><strong>Status:</strong> {{ auction.status|title }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Ends:</strong> {{ auction.end_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                        {% if auction.is_secret_bidding %}
+                        <div class="alert alert-warning">
+                            This auction requires secret bidding (above ₹10 Cr)
+                        </div>
+                        {% else %}
+                        <p><strong>Next Minimum Bid:</strong> ₹{{ "%.2f"|format(next_min_bid) }} Cr</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        {% if current_user.is_authenticated and auction.status == 'active' and current_user.team %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Place Bid</h4>
+            </div>
+            <div class="card-body">
+                <form id="bid-form">
+                    <div class="mb-3">
+                        <label for="team-name" class="form-label">Your Team</label>
+                        <input type="text" class="form-control" id="team-name" value="{{ current_user.team.name }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bid-amount" class="form-label">Bid Amount (Cr)</label>
+                        {% if auction.is_secret_bidding %}
+                        <input type="number" class="form-control" id="bid-amount" step="0.01" min="10" required>
+                        <small class="text-muted">Secret bidding: Enter your best bid</small>
+                        {% else %}
+                        <input type="number" class="form-control" id="bid-amount" value="{{ next_min_bid }}" step="0.01" min="{{ next_min_bid }}" required>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" {% if current_user.team.budget < next_min_bid %}disabled{% endif %}>
+                        Place Bid
+                    </button>
+                    {% if current_user.team.budget < next_min_bid %}
+                    <small class="text-danger">Insufficient budget</small>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header">
+                <h4>Bid History</h4>
+            </div>
+            <div class="card-body">
+                <div class="bid-history">
+                    {% for bid in auction.bids|sort(attribute='timestamp', reverse=True) %}
+                    <div class="bid-item">
+                        <p class="mb-1">
+                            <strong>₹{{ "%.2f"|format(bid.amount) }} Cr</strong> by {{ bid.team.name }}
+                        </p>
+                        <small class="text-muted">{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    </div>
+                    {% else %}
+                    <p>No bids yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bidForm = document.getElementById('bid-form');
+    if (bidForm) {
+        bidForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const amount = document.getElementById('bid-amount').value;
+            const teamName = document.getElementById('team-name').value;
+            
+            try {
+                const response = await fetch("{{ url_for('place_bid') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `auction_id={{ auction.id }}&amount=${amount}&team_name=${teamName}`
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                alert('An error occurred while placing your bid');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
