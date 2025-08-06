@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Create Your Team</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="team_name" class="form-label">Team Name</label>
+                        <input type="text" class="form-control" id="team_name" name="team_name" required>
+                        <small class="text-muted">Choose a unique name for your team</small>
+                    </div>
+                    <div class="alert alert-info">
+                        <h5>Team Requirements:</h5>
+                        <ul class="mb-0">
+                            <li>Maximum Budget: ₹100 crore</li>
+                            <li>Maximum Players: 25</li>
+                            <li>Minimum Requirements:
+                                <ul>
+                                    <li>4 Batsmen</li>
+                                    <li>2 All-Rounders</li>
+                                    <li>1 Wicketkeeper</li>
+                                    <li>4 Bowlers</li>
+                                    <li>1 Uncapped Player (mandatory)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Create Team</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

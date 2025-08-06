@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>{{ team.name }}</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Budget Remaining:</strong> ₹{{ "%.2f"|format(team.budget) }} Cr</p>
+                <p><strong>Total Players:</strong> {{ team.players|length }}/25</p>
+                <p><strong>Points:</strong> {{ team.points }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Team Requirements</h4>
+            </div>
+            <div class="card-body">
+                {% set requirements = validate_team_requirements(team) %}
+                <ul class="list-unstyled">
+                    <li>
+                        <span class="{% if requirements.batsmen %}text-success{% else %}text-danger{% endif %}">
+                            �{{ '✓' if requirements.batsmen else '✗' }} Batsmen (min 4)
+                        </span>
+                    </li>
+                    <li>
+                        <span class="{% if requirements.bowlers %}text-success{% else %}text-danger{% endif %}">
+                            {{ '✓' if requirements.bowlers else '✗' }} Bowlers (min 4)
+                        </span>
+                    </li>
+                    <li>
+                        <span class="{% if requirements.all_rounders %}text-success{% else %}text-danger{% endif %}">
+                            {{ '✓' if requirements.all_rounders else '✗' }} All-Rounders (min 2)
+                        </span>
+                    </li>
+                    <li>
+                        <span class="{% if requirements.wicketkeeper %}text-success{% else %}text-danger{% endif %}">
+                            {{ '✓' if requirements.wicketkeeper else '✗' }} Wicketkeeper (min 1)
+                        </span>
+                    </li>
+                    <li>
+                        <span class="{% if requirements.uncapped %}text-success{% else %}text-danger{% endif %}">
+                            {{ '✓' if requirements.uncapped else '✗' }} Uncapped Player (min 1)
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>Squad</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Price (Cr)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in team.players %}
+                            <tr>
+                                <td>
+                                    {{ player.name }}
+                                    {% if player.is_uncapped %}
+                                    <span class="badge bg-info">Uncapped</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ player.type|title }}</td>
+                                <td>{{ player.status|title }}</td>
+                                <td>₹{{ "%.2f"|format(player.current_price) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No players in squad yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

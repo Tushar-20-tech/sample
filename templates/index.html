@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="alert alert-info">
+            <h4 class="alert-heading">FCC IPL FANTASY AUCTION 2025</h4>
+            <p class="mb-0">Welcome to the FCC IPL Fantasy Auction! Build your dream team following these rules:</p>
+            <ul>
+                <li>Maximum Budget: ₹100 crore</li>
+                <li>Maximum Players: 25</li>
+                <li>Minimum Requirements:
+                    <ul>
+                        <li>4 Batsmen</li>
+                        <li>2 All-Rounders</li>
+                        <li>1 Wicketkeeper</li>
+                        <li>4 Bowlers</li>
+                        <li>1 Uncapped Player (mandatory)</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    {% if current_user.is_authenticated %}
+        {% if current_user.team %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Your Team: {{ current_user.team.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Budget Remaining:</strong> ₹{{ "%.2f"|format(current_user.team.budget) }} Cr</p>
+                    <p><strong>Players:</strong> {{ current_user.team.players|length }}/25</p>
+                    <a href="{{ url_for('view_team', team_id=current_user.team.id) }}" class="btn btn-primary">View Team</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Create Your Team</h3>
+                </div>
+                <div class="card-body">
+                    <p>You need to create a team before participating in auctions.</p>
+                    <a href="{{ url_for('create_team') }}" class="btn btn-primary">Create Team</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">Active Auctions</h2>
+    </div>
+    
+    {% for auction in active_auctions %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ auction.player.name }}
+                    {% if auction.player.is_uncapped %}
+                    <span class="badge bg-info">Uncapped</span>
+                    {% endif %}
+                </h5>
+                <p class="card-text">
+                    <strong>Type:</strong> {{ auction.player.type|title }}<br>
+                    <strong>Current Bid:</strong> ₹{{ "%.2f"|format(auction.current_bid) }} Cr<br>
+                    <strong>Base Price:</strong> ₹{{ "%.2f"|format(auction.player.base_price) }} Cr
+                </p>
+                {% if auction.is_secret_bidding %}
+                <div class="alert alert-warning">
+                    Secret Bidding (Above ₹10 Cr)
+                </div>
+                {% endif %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Ends: {{ auction.end_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                    <a href="{{ url_for('auction_detail', auction_id=auction.id) }}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <p class="text-center">No active auctions at the moment.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if current_user.is_authenticated and current_user.team %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Bidding Rules</h3>
+            </div>
+            <div class="card-body">
+                <h5>Bidding Increments:</h5>
+                <ul>
+                    <li>₹0.2 to ₹1 crore: Increase by ₹0.10 crore</li>
+                    <li>₹1 to ₹5 crore: Increase by ₹0.25 crore</li>
+                    <li>₹5 to ₹10 crore: Increase by ₹0.5 crore</li>
+                    <li>Above ₹10 crore: Secret bidding</li>
+                </ul>
+                <div class="alert alert-warning">
+                    <strong>Note:</strong> Bids must be placed with the team name (automatically added). Any bid that doesn't follow the rules will be cancelled.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
