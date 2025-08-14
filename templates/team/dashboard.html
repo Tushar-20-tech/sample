@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container wide">
+	<h2>Team Dashboard</h2>
+	<div class="grid-2">
+		<div class="glass card">
+			<h3>Team Profile</h3>
+			<form method="post">
+				<label>Team Name
+					<input name="name" value="{{ team.name if team else '' }}" required />
+				</label>
+				<label>Logo URL
+					<input name="logo_url" value="{{ team.logo_url if team else '' }}" />
+				</label>
+				<label>Strategy
+					<select name="strategy">
+						<option value="balanced" {% if team and team.strategy=='balanced' %}selected{% endif %}>Balanced</option>
+						<option value="batting-heavy" {% if team and team.strategy=='batting-heavy' %}selected{% endif %}>Batting-heavy</option>
+						<option value="bowling-heavy" {% if team and team.strategy=='bowling-heavy' %}selected{% endif %}>Bowling-heavy</option>
+					</select>
+				</label>
+				<label>Budget (₹)
+					<input type="number" name="budget" value="{{ team.budget_total if team else 100000000 }}" />
+				</label>
+				<button class="btn" type="submit">Save</button>
+			</form>
+			{% if team and not team.approved %}
+			<p class="note">Awaiting admin approval.</p>
+			{% endif %}
+		</div>
+		<div class="glass card">
+			<h3>Auctions</h3>
+			<ul>
+				{% for a in auctions %}
+				<li>
+					<strong>{{ a.name }}</strong> — {{ a.status }}
+					<a class="btn small" href="/auction/live/{{ a.id }}">Join</a>
+				</li>
+				{% else %}
+				<li>No auctions available</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+{% endblock %}

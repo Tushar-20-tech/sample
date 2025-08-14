@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container narrow glass">
+	<h2>Player Registration</h2>
+	<form method="post">
+		<label>Name
+			<input name="name" value="{{ player.name if player else '' }}" required />
+		</label>
+		<label>Role
+			<select name="role">
+				{% set roles = ['Batter','Bowler','All-Rounder','Wicketkeeper'] %}
+				{% for r in roles %}
+				<option value="{{ r }}" {% if player and player.role==r %}selected{% endif %}>{{ r }}</option>
+				{% endfor %}
+			</select>
+		</label>
+		<label>Base Price (₹)
+			<input type="number" name="base_price" value="{{ player.base_price if player else 1000000 }}" />
+		</label>
+		<label>Highlight Video URL
+			<input name="highlight_url" value="{{ player.highlight_url if player else '' }}" />
+		</label>
+		<fieldset>
+			<legend>Stats</legend>
+			<label>Matches <input type="number" name="matches" value="{{ player.stats_json.matches if player and player.stats_json else 0 }}" /></label>
+			<label>Runs <input type="number" name="runs" value="{{ player.stats_json.runs if player and player.stats_json else 0 }}" /></label>
+			<label>Wickets <input type="number" name="wickets" value="{{ player.stats_json.wickets if player and player.stats_json else 0 }}" /></label>
+			<label>Strike Rate <input type="number" step="0.01" name="strike_rate" value="{{ player.stats_json.strike_rate if player and player.stats_json else 0 }}" /></label>
+			<label>Economy <input type="number" step="0.01" name="economy" value="{{ player.stats_json.economy if player and player.stats_json else 0 }}" /></label>
+		</fieldset>
+		<button class="btn" type="submit">Submit</button>
+	</form>
+</div>
+{% endblock %}
