@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container wide">
+	<h2>{{ auction.name }} — Live</h2>
+	<div class="grid-3">
+		<div class="glass card" id="playerCard">
+			<h3>Player</h3>
+			<div id="playerInfo">Select player to start...</div>
+			<video id="playerVideo" controls style="display:none; width:100%"></video>
+		</div>
+		<div class="glass card" id="biddingArea">
+			<h3>Current Bid</h3>
+			<div class="price" id="currentBid">₹0</div>
+			<div id="countdown" class="countdown" aria-live="polite">--</div>
+			<div class="actions">
+				<label>Amount (₹)
+					<input type="number" id="bidAmount" value="0" />
+				</label>
+				<button class="btn" id="placeBidBtn">Place Bid (B)</button>
+				<label>Auto-bid up to
+					<input type="number" id="autoBidMax" value="0" />
+				</label>
+				<button class="btn secondary" id="setAutoBidBtn">Enable Auto-bid (A)</button>
+			</div>
+			<div id="gavel" class="gavel" aria-hidden="true"></div>
+		</div>
+		<div class="glass card" id="sidePanel">
+			<h3>Live Commentary</h3>
+			<ul id="commentary" class="scroll"></ul>
+			<h3>Leaderboard</h3>
+			<canvas id="leaderboardChart" height="140"></canvas>
+		</div>
+	</div>
+	<div class="glass card">
+		<h3>Bid History</h3>
+		<canvas id="bidHistoryChart" height="120"></canvas>
+	</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/auction.js"></script>
+<script>
+window.AUCTION = {
+	auctionId: {{ auction.id }},
+	teamId: {{ user.team.id if user and user.role=='team' and user.team else 'null' }},
+	players: {{ players_json|tojson }},
+	teams: {{ teams_json|tojson }}
+};
+</script>
+{% endblock %}

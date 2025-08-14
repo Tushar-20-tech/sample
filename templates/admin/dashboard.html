@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container wide">
+	<h2>Admin Dashboard</h2>
+	<div class="grid-2">
+		<div class="glass card">
+			<h3>Create Auction</h3>
+			<form method="post" action="/admin/create_auction">
+				<label>Name
+					<input name="name" placeholder="Mega Auction 2025" required />
+				</label>
+				<label>Scheduled At
+					<input name="scheduled_at" type="datetime-local" required />
+				</label>
+				<label>Budget per Team (₹)
+					<input name="budget" type="number" value="100000000" />
+				</label>
+				<button class="btn" type="submit">Create</button>
+			</form>
+		</div>
+		<div class="glass card">
+			<h3>Pending Approvals</h3>
+			<h4>Teams</h4>
+			<ul>
+				{% for t in pending_teams %}
+				<li>
+					{{ t.name or 'New Team' }}
+					<form method="post" action="/admin/approve_team/{{ t.id }}" style="display:inline">
+						<button class="btn small" type="submit">Approve</button>
+					</form>
+				</li>
+				{% else %}
+				<li>No pending teams</li>
+				{% endfor %}
+			</ul>
+			<h4>Players</h4>
+			<ul>
+				{% for p in pending_players %}
+				<li>
+					{{ p.name }} ({{ p.role }})
+					<form method="post" action="/admin/approve_player/{{ p.id }}" style="display:inline">
+						<button class="btn small" type="submit">Approve</button>
+					</form>
+				</li>
+				{% else %}
+				<li>No pending players</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="glass card">
+		<h3>Auctions</h3>
+		<table class="table">
+			<tr><th>Name</th><th>Schedule</th><th>Status</th><th>Actions</th></tr>
+			{% for a in auctions %}
+			<tr>
+				<td>{{ a.name }}</td>
+				<td>{{ a.scheduled_at }}</td>
+				<td>{{ a.status }}</td>
+				<td>
+					<a class="btn small" href="/auction/live/{{ a.id }}" target="_blank">Open Live</a>
+				</td>
+			</tr>
+			{% else %}
+			<tr><td colspan="4">No auctions yet</td></tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+{% endblock %}

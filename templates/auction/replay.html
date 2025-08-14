@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container narrow glass">
+	<h2>{{ auction.name }} — Replay</h2>
+	<input type="range" id="timeline" min="0" max="{{ bids|length }}" value="0" />
+	<pre id="eventView"></pre>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const bids = {{ bids|tojson }};
+const timeline = document.getElementById('timeline');
+const view = document.getElementById('eventView');
+function render(n){
+	const slice = bids.slice(0, n);
+	view.textContent = slice.map(b => `${b.timestamp} — Team ${b.team_id} bid ₹${b.amount}`).join('\n');
+}
+render(0);
+timeline.addEventListener('input', () => render(parseInt(timeline.value)));
+</script>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container glass">
+	<h2>Live & Upcoming Auctions</h2>
+	<ul>
+		{% for a in auctions %}
+		<li>
+			<strong>{{ a.name }}</strong> — {{ a.status }}
+			<a class="btn small" href="/auction/live/{{ a.id }}">Open</a>
+		</li>
+		{% else %}
+		<li>No auctions currently</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock %}
